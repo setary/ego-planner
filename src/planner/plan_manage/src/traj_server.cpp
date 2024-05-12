@@ -6,6 +6,14 @@
 #include "visualization_msgs/Marker.h"
 #include <ros/ros.h>
 
+#include <sensor_msgs/PointCloud2.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_types.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl/conversions.h>
+#include "test_plan_env.hpp"
+
+
 ros::Publisher pos_cmd_pub;
 
 quadrotor_msgs::PositionCommand cmd;
@@ -229,17 +237,29 @@ void cmdCallback(const ros::TimerEvent &e)
   pos_cmd_pub.publish(cmd);
 }
 
+void callback(const sensor_msgs::PointCloud2ConstPtr &cloud) {
+    pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::fromROSMsg(*cloud, *temp_cloud);
+    printf("received %ld points!!!!\n", temp_cloud->points.size());
+}
+
 int main(int argc, char **argv)
 {
+  printf("trai_server start!!!!\n");
   ros::init(argc, argv, "traj_server");
   ros::NodeHandle node;
   ros::NodeHandle nh("~");
 
-  ros::Subscriber bspline_sub = node.subscribe("planning/bspline", 10, bsplineCallback);
+  ros::Subscriber sub = nh.subscribe("/grid_map/occupancy", 10, &callback);
+  printf("Subscriber start!!!\n");
+  test_ray_caster();
+  test_grid_map_init_map(nh);
+
+  /*ros::Subscriber bspline_sub = node.subscribe("planning/bspline", 10, bsplineCallback);
 
   pos_cmd_pub = node.advertise<quadrotor_msgs::PositionCommand>("/position_cmd", 50);
 
-  ros::Timer cmd_timer = node.createTimer(ros::Duration(0.01), cmdCallback);
+  ros::Timer cmd_timer = node.createTimer(ros::Duration(0.01), cmdCallback);*/
 
   /* control parameter */
   cmd.kx[0] = pos_gain[0];

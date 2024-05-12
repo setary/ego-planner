@@ -63,7 +63,7 @@ target_link_libraries(ego_planner_node
   )
 add_dependencies(ego_planner_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
-add_executable(traj_server src/traj_server.cpp)
+add_executable(traj_server src/traj_server.cpp src/test_plan_env.cpp)
 target_link_libraries(traj_server ${catkin_LIBRARIES})
 add_dependencies(traj_server ${${PROJECT_NAME}_EXPORTED_TARGETS})
 

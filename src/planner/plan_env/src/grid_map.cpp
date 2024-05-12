@@ -828,7 +828,7 @@ void GridMap::cloudCallback(const sensor_msgs::PointCloud2ConstPtr &img)
 
 void GridMap::publishMap()
 {
-
+  printf("GridMap::publishMap subscriber num: %d\n", map_pub_.getNumSubscribers());
   if (map_pub_.getNumSubscribers() <= 0)
     return;
 
@@ -849,6 +849,7 @@ void GridMap::publishMap()
     for (int y = min_cut(1); y <= max_cut(1); ++y)
       for (int z = min_cut(2); z <= max_cut(2); ++z)
       {
+        //printf("idx: %d, x: %d, y: %d, z: %d\n", toAddress(x, y, z), x, y, z);
         if (md_.occupancy_buffer_[toAddress(x, y, z)] < mp_.min_occupancy_log_)
           continue;
 
@@ -869,6 +870,7 @@ void GridMap::publishMap()
   sensor_msgs::PointCloud2 cloud_msg;
 
   pcl::toROSMsg(cloud, cloud_msg);
+  printf("map_pub_.publish\n");
   map_pub_.publish(cloud_msg);
 }
 
